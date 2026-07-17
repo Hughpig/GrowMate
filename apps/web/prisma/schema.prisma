@@ -1,0 +1,178 @@
+// GrowMate Prisma Schema
+// 五层架构：用户数据 → AI档案 → 内容 → 社区 → 心理监护
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  bio          String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  journalEntries JournalEntry[]
+  moodLogs       MoodLog[]
+  posts          Post[]
+  comments       Comment[]
+  courseProgress CourseProgress[]
+  aiProfile      AiProfile?
+  checkIns       CheckIn[]
+}
+
+// 第一层：个人主观记录
+model JournalEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  mood      Int?     // 1-5
+  tags      String   @default("[]") // JSON array string
+  isPrivate Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// 人格&心理：情绪打卡
+model MoodLog {
+  id         String   @id @default(cuid())
+  userId     String
+  score      Int      // 1-5 情绪分
+  energy     Int      @default(3) // 1-5 精力
+  stress     Int      @default(3) // 1-5 压力
+  note       String?
+  riskLevel  String   @default("normal") // normal | watch | alert
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// 第二层：AI 个人档案
+model AiProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  summary         String   @default("")
+  personalityTags String   @default("[]") // JSON
+  strengths       String   @default("[]")
+  weaknesses      String   @default("[]")
+  emotionPattern  String   @default("")
+  goals           String   @default("[]")
+  rawFeatures     String   @default("{}") // JSON features blob
+  lastAnalyzedAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 第四层：垂直社区
+model Community {
+  id          String @id @default(cuid())
+  slug        String @unique
+  name        String
+  description String
+  icon        String @default("users")
+  tone        String @default("supportive") // supportive | healing | training | learning
+  posts       Post[]
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  communityId String
+  authorId    String
+  title       String
+  content     String
+  isAnonymous Boolean  @default(false)
+  likeCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+
+  @@index([communityId, createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+}
+
+// 第三层：专业内容赋能
+model CourseModule {
+  id          String   @id @default(cuid())
+  slug        String   @unique // fitness | nutrition | tech | mental
+  name        String
+  description String
+  courses     Course[]
+}
+
+model Course {
+  id          String @id @default(cuid())
+  moduleId    String
+  title       String
+  summary     String
+  level       String @default("beginner") // beginner | intermediate | advanced
+  durationMin Int    @default(30)
+  content     String
+  order       Int    @default(0)
+
+  module   CourseModule     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress CourseProgress[]
+
+  @@index([moduleId, order])
+}
+
+model CourseProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  courseId    String
+  status      String    @default("not_started") // not_started | in_progress | completed
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+// 打卡：体能/学习/饮食
+model CheckIn {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // fitness | nutrition | tech | mental | custom
+  title     String
+  note      String?
+  value     Float?
+  unit      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, createdAt])
+}

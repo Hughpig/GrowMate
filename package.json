@@ -1,0 +1,15 @@
+{
+  "name": "growmate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "陪伴成长型综合社区平台 - AI个人档案 + 多领域成长赋能 + 垂直陪伴社区",
+  "scripts": {
+    "dev": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/web run build",
+    "start": "npm --prefix apps/web run start",
+    "db:generate": "npm --prefix apps/web run db:generate",
+    "db:push": "npm --prefix apps/web run db:push",
+    "db:seed": "npm --prefix apps/web run db:seed",
+    "setup": "npm --prefix apps/web install && npm --prefix apps/web run db:generate && npm --prefix apps/web run db:push && npm --prefix apps/web run db:seed"
+  }
+}
