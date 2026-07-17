@@ -141,6 +141,18 @@ OPENAI_MODEL=gpt-4o-mini
 3. **AI + 可演进人工兜底** — 轻量风险识别，预留人工复核扩展  
 4. **模块解耦** — 社区与课程可独立运营、后续可扩展领域  
 
+## Git
+
+首次提交：`a7ef1f1`（chore: initial commit for GrowMate MVP）
+
+若根目录 `.git` 尚无提交记录，请运行一次：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\finalize-git.ps1
+```
+
+详见 [docs/GIT.md](docs/GIT.md)。
+
 ## 许可证
 
 本项目当前为私有创业原型，未声明开源许可证。如需开源请先补充 LICENSE。
