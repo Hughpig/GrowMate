@@ -1,29 +1,39 @@
 # Git 说明
 
-首次提交已完成，提交哈希：`a7ef1f1`
+## 当前状态
 
-由于 Codex 沙箱对项目根目录 `.git` 写入受限，提交对象暂存在：
+首次提交已完成：
 
-```text
-work/gitdir
-```
+| Commit | Message |
+|--------|---------|
+| `a7ef1f1` | chore: initial commit for GrowMate MVP |
+| `e1f82fb` | docs: add git finalize helper for sandbox-created repo |
 
-请在本机 PowerShell **运行一次** 完成规范化：
+若你已经运行过 `tools/finalize-git.ps1` 并看到 **Promoting work/gitdir -> .git**，说明仓库主体已经就绪。  
+脚本末尾若出现 `fatal: not in a git directory`，多半是旧脚本在 `git config` 步骤的误报，**一般可忽略**。
+
+请在项目根目录验证：
 
 ```powershell
 cd C:\Users\zxq\Documents\Codex\2026-07-17\ni-h
-powershell -ExecutionPolicy Bypass -File .\tools\finalize-git.ps1
-```
-
-完成后即可正常使用：
-
-```powershell
-git log -1
+git log --oneline
 git status
 ```
 
-在未 finalize 前，也可临时访问该提交：
+若能看到两条 commit，说明一切正常。
+
+## 可选清理
 
 ```powershell
-git --git-dir=work/gitdir --work-tree=. log -1 --oneline
+# 去掉绝对 worktree 路径（提高可移植性）
+git config --unset-all core.worktree
+
+# 删除空的备份目录
+Remove-Item -Recurse -Force .git-empty-backup-* -ErrorAction SilentlyContinue
+```
+
+## 再次 finalize（仅当 .git 仍无提交时）
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\finalize-git.ps1
 ```

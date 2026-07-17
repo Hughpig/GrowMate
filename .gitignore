@@ -53,3 +53,6 @@ work/**
 
 # Optional local tooling
 .vercel/
+
+# Temporary git backups from finalize script
+.git-empty-backup-*/
