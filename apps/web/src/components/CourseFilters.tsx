@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
+export type CourseFilterItem = {
+  id: string;
+  title: string;
+  level: string;
+  durationMin: number;
+};
 
 interface CourseFiltersProps {
-  courses: Array<{
-    id: string;
-    title: string;
-    level: string;
-    durationMin: number;
-  }>;
-  onFilter: (filteredCourses: typeof courses) => void;
+  courses: CourseFilterItem[];
+  onFilter: (filteredCourses: CourseFilterItem[]) => void;
 }
 
 export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {
@@ -18,35 +19,39 @@ export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [durationFilter, setDurationFilter] = useState<string>("all");
 
-  const levels = ["入门", "进阶", "高级"];
+  const levels = ["beginner", "intermediate", "advanced"];
+  const levelLabels: Record<string, string> = {
+    beginner: "入门",
+    intermediate: "进阶",
+    advanced: "高级",
+  };
   const durationRanges = [
-    { label: "全部", value: "all", max: Infinity },
-    { label: "短时间 (≤15分钟)", value: "short", max: 15 },
+    { label: "全部", value: "all", min: 0, max: Infinity },
+    { label: "短时间 (≤15分钟)", value: "short", min: 0, max: 15 },
     { label: "中等 (15-45分钟)", value: "medium", min: 15, max: 45 },
-    { label: "长时间 (>45分钟)", value: "long", min: 46 },
+    { label: "长时间 (>45分钟)", value: "long", min: 46, max: Infinity },
   ];
 
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.title.includes(searchTerm);
-    
-    const matchesLevel = levelFilter === "all" || course.level === levelFilter;
-    
-    let matchesDuration = true;
-    if (durationFilter !== "all") {
-      const range = durationRanges.find(r => r.value === durationFilter);
-      if (range) {
-        if (range.min) {
-          matchesDuration = course.durationMin >= range.min;
-        }
-        if (range.max) {
-          matchesDuration = course.durationMin <= range.max;
+  const filteredCourses = useMemo(() => {
+    return courses.filter((course) => {
+      const matchesSearch =
+        course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.title.includes(searchTerm);
+
+      const matchesLevel = levelFilter === "all" || course.level === levelFilter;
+
+      let matchesDuration = true;
+      if (durationFilter !== "all") {
+        const range = durationRanges.find((r) => r.value === durationFilter);
+        if (range) {
+          matchesDuration =
+            course.durationMin >= range.min && course.durationMin <= range.max;
         }
       }
-    }
 
-    return matchesSearch && matchesLevel && matchesDuration;
-  });
+      return matchesSearch && matchesLevel && matchesDuration;
+    });
+  }, [courses, searchTerm, levelFilter, durationFilter]);
 
   useEffect(() => {
     onFilter(filteredCourses);
@@ -54,7 +59,6 @@ export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {
 
   return (
     <div className="space-y-4 p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-stone-200">
-      {/* 搜索框 */}
       <div>
         <label className="label mb-2">搜索课程</label>
         <input
@@ -66,7 +70,6 @@ export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {
         />
       </div>
 
-      {/* 级别筛选 */}
       <div>
         <label className="label mb-2">课程级别</label>
         <div className="flex flex-wrap gap-2">
@@ -86,13 +89,12 @@ export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {
               }`}
               onClick={() => setLevelFilter(level)}
             >
-              {level}
+              {levelLabels[level]}
             </button>
           ))}
         </div>
       </div>
 
-      {/* 时长筛选 */}
       <div>
         <label className="label mb-2">课程时长</label>
         <div className="flex flex-wrap gap-2">
@@ -110,7 +112,6 @@ export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {
         </div>
       </div>
 
-      {/* 结果统计 */}
       <div className="text-sm text-stone-500">
         找到 {filteredCourses.length} 个课程
       </div>

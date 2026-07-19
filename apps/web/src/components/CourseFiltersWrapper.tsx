@@ -1,16 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { CourseFilters } from "@/components/CourseFilters";
+import { CourseFilters, type CourseFilterItem } from "@/components/CourseFilters";
 
 interface CourseFiltersWrapperProps {
-  courses: Array<{
-    id: string;
-    title: string;
-    level: string;
-    durationMin: number;
-  }>;
-  children: (filteredCourses: typeof courses) => React.ReactNode;
+  courses: CourseFilterItem[];
+  children: (filteredCourses: CourseFilterItem[]) => React.ReactNode;
 }
 
 export function CourseFiltersWrapper({ courses, children }: CourseFiltersWrapperProps) {
@@ -18,9 +13,9 @@ export function CourseFiltersWrapper({ courses, children }: CourseFiltersWrapper
 
   return (
     <div className="space-y-6">
-      <CourseFilters 
-        courses={courses} 
-        onFilter={setFilteredCourses} 
+      <CourseFilters
+        courses={courses}
+        onFilter={setFilteredCourses}
       />
       {children(filteredCourses)}
     </div>
