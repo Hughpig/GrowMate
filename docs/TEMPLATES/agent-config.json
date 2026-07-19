@@ -1,0 +1,84 @@
+{
+  "name": "GrowMate Agent",
+  "version": "1.0.0",
+  "description": "陪伴成长型综合社区平台 Agent",
+  "project": {
+    "type": "web-application",
+    "stack": ["nextjs", "typescript", "prisma", "tailwindcss"],
+    "database": "sqlite",
+    "ai": "openai",
+    "framework": "react"
+  },
+  "endpoints": {
+    "local": "http://localhost:3000",
+    "demo": {
+      "email": "demo@growmate.app",
+      "password": "demo123456"
+    }
+  },
+  "features": [
+    "learning-management",
+    "ai-companion", 
+    "community-platform",
+    "progress-tracking",
+    "mood-tracking",
+    "journal-system"
+  ],
+  "testing": {
+    "default-account": "demo@growmate.app",
+    "critical-paths": [
+      "/login",
+      "/dashboard", 
+      "/learn/tech",
+      "/ai",
+      "/community"
+    ],
+    "smoke-test": [
+      "首页加载",
+      "用户登录",
+      "课程模块访问",
+      "AI 对话功能",
+      "数据持久化"
+    ]
+  },
+  "development": {
+    "commands": {
+      "dev": "npm run dev",
+      "build": "npm run build", 
+      "start": "npm run start",
+      "db:generate": "npm run db:generate",
+      "db:push": "npm run db:push",
+      "db:seed": "npm run db:seed",
+      "db:studio": "npm run db:studio"
+    },
+    "directories": {
+      "source": "apps/web/src",
+      "components": "apps/web/src/components",
+      "pages": "apps/web/src/app",
+      "types": "apps/web/src/types",
+      "prisma": "apps/web/prisma"
+    }
+  },
+  "ai": {
+    "provider": "openai",
+    "models": ["gpt-4o-mini"],
+    "endpoints": {
+      "chat": "/api/ai/chat",
+      "analyze": "/api/ai/analyze"
+    }
+  },
+  "auth": {
+    "strategy": "jwt",
+    "cookie-name": "growmate_token",
+    "routes": {
+      "login": "/login",
+      "register": "/register",
+      "logout": "/api/auth/logout"
+    }
+  },
+  "database": {
+    "provider": "sqlite",
+    "file": "dev.db",
+    "schema": "prisma/schema.prisma"
+  }
+}
