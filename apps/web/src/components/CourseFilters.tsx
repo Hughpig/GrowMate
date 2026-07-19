@@ -21,9 +21,9 @@ export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {
   const levels = ["入门", "进阶", "高级"];
   const durationRanges = [
     { label: "全部", value: "all", max: Infinity },
-    { label: "短时间 (<15分钟)", value: "short", max: 15 },
-    { label: "中等 (15-45分钟)", value: "medium", max: 45 },
-    { label: "长时间 (>45分钟)", value: "long", min: 45 },
+    { label: "短时间 (≤15分钟)", value: "short", max: 15 },
+    { label: "中等 (15-45分钟)", value: "medium", min: 15, max: 45 },
+    { label: "长时间 (>45分钟)", value: "long", min: 46 },
   ];
 
   const filteredCourses = courses.filter(course => {
