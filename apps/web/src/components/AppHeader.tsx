@@ -9,6 +9,7 @@ const links = [
   { href: "/archive", label: "AI档案" },
   { href: "/ai", label: "AI陪伴" },
   { href: "/learn", label: "成长课程" },
+  { href: "/training", label: "训练助手" },
   { href: "/community", label: "社区" },
 ];
 

@@ -28,6 +28,8 @@ model User {
   aiProfile      AiProfile?
   checkIns       CheckIn[]
   diarySchedules DiarySchedule[]
+  trainingGoals  TrainingGoal[]
+  trainingPlans  TrainingPlanRecord[]
 }
 
 // 缁楊兛绔寸仦鍌︾窗娑擃亙姹夋稉鏄忣潎鐠佹澘缍?
@@ -202,4 +204,43 @@ model DiarySchedule {
   journal JournalEntry?  @relation(fields: [journalEntryId], references: [id], onDelete: SetNull)
 
   @@index([userId, startAt])
+}
+
+// Personal training assistant
+model TrainingGoal {
+  id                 String   @id @default(cuid())
+  userId             String
+  type               String
+  targetWeightLoss   Float?
+  timelineWeeks      Int?
+  focusAreas         String   @default("[]")
+  uncomfortableParts String   @default("[]")
+  customGoalText     String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, updatedAt])
+}
+
+model TrainingPlanRecord {
+  id                String   @id @default(cuid())
+  userId            String
+  name              String
+  type              String
+  durationMinutes   Int
+  intensity         String
+  adjustmentReason  String   @default("")
+  exercisesJson     String   @default("[]")
+  wellnessJson      String   @default("{}")
+  citationsJson     String   @default("[]")
+  goalSnapshotJson  String   @default("{}")
+  dailyStatusJson   String   @default("{}")
+  source            String   @default("local")
+  createdAt         DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

@@ -1,0 +1,6 @@
+{
+  "name": "个人训练安排助手",
+  "description": "专为工作人群设计的动态训练计划与方案助手，支持语音与模块化快捷状态输入，根据每天的反馈动态智能调整训练计划，预留饮食和睡眠扩展空间。",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
