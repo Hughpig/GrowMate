@@ -465,7 +465,7 @@ docker exec growmate cat /proc/cpuinfo
 docker run -m 512m --cpus=1.0 growmate:latest
 
 # 只读文件系统
-docker run -read-only --tmpfs /tmp growmate:latest
+docker run --read-only --tmpfs /tmp growmate:latest
 ```
 
 ### 2. 网络安全

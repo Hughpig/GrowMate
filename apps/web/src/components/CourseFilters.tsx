@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 
 
+interface Course {
+  id: string;
+  title: string;
+  level: string;
+  durationMin: number;
+}
+
 interface CourseFiltersProps {
-  courses: Array<{
-    id: string;
-    title: string;
-    level: string;
-    durationMin: number;
-  }>;
-  onFilter: (filteredCourses: typeof courses) => void;
+  courses: Course[];
+  onFilter: (filteredCourses: Course[]) => void;
 }
 
 export function CourseFilters({ courses, onFilter }: CourseFiltersProps) {

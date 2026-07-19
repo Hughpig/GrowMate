@@ -38,8 +38,8 @@ test_step() {
 
 # 1. 环境检查
 echo "📋 环境检查..."
-test_step "Node.js 版本检查" "node --version | grep 'v18.'"
-test_step "npm 版本检查" "npm --version | grep '^8\.'"
+test_step "Node.js 版本检查" "node --version | grep -E 'v18\.|v20\.|v22\.'"
+test_step "npm 版本检查" "npm --version | grep -E '^[89]\.|^10\.'"
 
 # 2. 依赖安装
 echo "📦 依赖检查..."
@@ -69,7 +69,7 @@ test_step "社区模块访问" "curl -s -o /dev/null -w '%{http_code}' http://lo
 
 # 7. 数据库连接测试
 echo "🔗 数据库连接测试..."
-test_step "数据库连接" "node -e \"const { PrismaClient } = require('./apps/web/src/lib/db'); new PrismaClient().\$connect().then(() => console.log('Connected'))\""
+test_step "数据库连接" "node -e \"const { PrismaClient } = require('@prisma/client'); new PrismaClient().\$connect().then(() => console.log('Connected'))\""
 
 # 8. 构建测试
 echo "🔨 构建测试..."

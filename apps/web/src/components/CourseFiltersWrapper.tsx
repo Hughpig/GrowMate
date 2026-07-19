@@ -3,14 +3,16 @@
 import { useState } from "react";
 import { CourseFilters } from "@/components/CourseFilters";
 
+interface Course {
+  id: string;
+  title: string;
+  level: string;
+  durationMin: number;
+}
+
 interface CourseFiltersWrapperProps {
-  courses: Array<{
-    id: string;
-    title: string;
-    level: string;
-    durationMin: number;
-  }>;
-  children: (filteredCourses: typeof courses) => React.ReactNode;
+  courses: Course[];
+  children: (filteredCourses: Course[]) => React.ReactNode;
 }
 
 export function CourseFiltersWrapper({ courses, children }: CourseFiltersWrapperProps) {

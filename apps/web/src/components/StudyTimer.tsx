@@ -7,9 +7,10 @@ interface StudyTimerProps {
   courseId: string;
   courseTitle: string;
   onTimeUpdate?: (timeInSeconds: number) => void;
+  onSessionEnd?: (timeInSeconds: number) => void;
 }
 
-export function StudyTimer({ courseId, courseTitle, onTimeUpdate }: StudyTimerProps) {
+export function StudyTimer({ courseId, courseTitle, onTimeUpdate, onSessionEnd }: StudyTimerProps) {
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [time, setTime] = useState(0);
@@ -52,6 +53,7 @@ export function StudyTimer({ courseId, courseTitle, onTimeUpdate }: StudyTimerPr
     setTime(0);
     if (time > 0) {
       setSessionCount(sessionCount + 1);
+      onSessionEnd?.(time);
     }
   };
 
