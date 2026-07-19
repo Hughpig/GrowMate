@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 多层标签日记</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section id="authView" class="auth-panel">
+        <div>
+          <h1>AI 多层标签日记</h1>
+          <p>登录后记录纯文字日记，系统生成事件、情绪、性格、价值观、幸福度标签，并识别计划日程。</p>
+        </div>
+        <form id="authForm" class="stack">
+          <input id="email" type="email" placeholder="邮箱" autocomplete="email" required />
+          <input id="password" type="password" placeholder="密码，至少 8 位" autocomplete="current-password" required />
+          <div class="row">
+            <button type="submit" data-mode="login">登录</button>
+            <button type="button" id="registerBtn" class="secondary">注册</button>
+          </div>
+          <p id="authError" class="error"></p>
+        </form>
+      </section>
+
+      <section id="appView" class="app hidden">
+        <header class="topbar">
+          <div>
+            <h1>每日记录</h1>
+            <p id="userLine"></p>
+          </div>
+          <button id="logoutBtn" class="secondary">退出</button>
+        </header>
+
+        <section class="composer">
+          <div class="composer-head">
+            <strong>写一条日记</strong>
+            <span id="counter">0 / 2000</span>
+          </div>
+          <textarea id="diaryInput" rows="6" placeholder="仅支持纯文字。断网或提交失败时会清空，不保留草稿。"></textarea>
+          <div class="composer-foot">
+            <span id="inputError" class="error"></span>
+            <button id="saveBtn" disabled>保存并分析</button>
+          </div>
+        </section>
+
+        <section class="filters">
+          <label>
+            日期
+            <input id="dateFilter" type="date" />
+          </label>
+          <button id="clearFilterBtn" class="secondary">清除筛选</button>
+          <div id="tagFilters" class="tag-cloud"></div>
+        </section>
+
+        <section class="grid">
+          <div>
+            <h2>日记</h2>
+            <div id="entries" class="entries"></div>
+          </div>
+          <aside>
+            <h2>日程</h2>
+            <div id="schedules" class="schedules"></div>
+          </aside>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="scheduleDialog">
+      <form method="dialog" id="scheduleForm" class="stack">
+        <h2>加入日程？</h2>
+        <input id="scheduleTitle" placeholder="标题" required />
+        <input id="scheduleStart" type="datetime-local" required />
+        <input id="scheduleEnd" type="datetime-local" />
+        <input id="scheduleLocation" placeholder="地点，可选" />
+        <textarea id="scheduleNote" rows="3" placeholder="备注"></textarea>
+        <label>
+          提醒
+          <select id="reminderOffset">
+            <option value="0">开始时</option>
+            <option value="5">提前 5 分钟</option>
+            <option value="15" selected>提前 15 分钟</option>
+            <option value="30">提前 30 分钟</option>
+            <option value="60">提前 1 小时</option>
+            <option value="120">提前 2 小时</option>
+            <option value="1440">提前 1 天</option>
+          </select>
+        </label>
+        <div class="row right">
+          <button type="button" id="cancelScheduleBtn" class="secondary">取消</button>
+          <button type="submit">确认添加</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
+

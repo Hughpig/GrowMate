@@ -1,0 +1,4 @@
+interface:
+  display_name: "One Sentence Self Profile"
+  short_description: "Analyze brief self descriptions."
+  default_prompt: "Analyze this one-sentence personal description into values, personality, emotion, behavior, and happiness signals."
