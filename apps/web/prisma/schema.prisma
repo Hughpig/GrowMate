@@ -1,5 +1,5 @@
 // GrowMate Prisma Schema
-// 五层架构：用户数据 → AI档案 → 内容 → 社区 → 心理监护
+// 娴滄柨鐪伴弸鑸电€敍姘辨暏閹撮攱鏆熼幑?閳?AI濡楋絾顢?閳?閸愬懎顔?閳?缁€鎯у隘 閳?韫囧啰鎮婇惄鎴炲Б
 
 generator client {
   provider = "prisma-client-js"
@@ -27,32 +27,37 @@ model User {
   courseProgress CourseProgress[]
   aiProfile      AiProfile?
   checkIns       CheckIn[]
+  diarySchedules DiarySchedule[]
 }
 
-// 第一层：个人主观记录
+// 缁楊兛绔寸仦鍌︾窗娑擃亙姹夋稉鏄忣潎鐠佹澘缍?
 model JournalEntry {
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  content   String
-  mood      Int?     // 1-5
-  tags      String   @default("[]") // JSON array string
-  isPrivate Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  userId         String
+  title          String
+  content        String
+  mood           Int?     // 1-5
+  tags           String   @default("[]") // flat tag names JSON array
+  isPrivate      Boolean  @default(true)
+  timePeriod     String   @default("") // 涓婂崍|涓嬪崍|鏅氫笂|娣卞
+  analysisStatus String   @default("done") // pending|done|failed
+  analysisJson   String   @default("{}") // multi-layer AI tags + schedule candidate
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedules DiarySchedule[]
 
   @@index([userId, createdAt])
 }
 
-// 人格&心理：情绪打卡
+// 娴滅儤鐗?韫囧啰鎮婇敍姘剰缂侇亝澧﹂崡?
 model MoodLog {
   id         String   @id @default(cuid())
   userId     String
-  score      Int      // 1-5 情绪分
-  energy     Int      @default(3) // 1-5 精力
-  stress     Int      @default(3) // 1-5 压力
+  score      Int      // 1-5 閹懐鍗庨崚?
+  energy     Int      @default(3) // 1-5 缁儳濮?
+  stress     Int      @default(3) // 1-5 閸樺濮?
   note       String?
   riskLevel  String   @default("normal") // normal | watch | alert
   createdAt  DateTime @default(now())
@@ -62,7 +67,7 @@ model MoodLog {
   @@index([userId, createdAt])
 }
 
-// 第二层：AI 个人档案
+// 缁楊兛绨╃仦鍌︾窗AI 娑擃亙姹夊锝嗩攳
 model AiProfile {
   id              String   @id @default(cuid())
   userId          String   @unique
@@ -80,7 +85,7 @@ model AiProfile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// 第四层：垂直社区
+// 缁楊剙娲撶仦鍌︾窗閸ㄥ倻娲跨粈鎯у隘
 model Community {
   id          String @id @default(cuid())
   slug        String @unique
@@ -122,7 +127,7 @@ model Comment {
   @@index([postId, createdAt])
 }
 
-// 第三层：专业内容赋能
+// 缁楊兛绗佺仦鍌︾窗娑撴挷绗熼崘鍛啇鐠у鍏?
 model CourseModule {
   id          String   @id @default(cuid())
   slug        String   @unique // fitness | nutrition | tech | mental
@@ -152,8 +157,8 @@ model CourseProgress {
   userId      String
   courseId    String
   status      String    @default("not_started") // not_started | in_progress | completed
-  notes       String    @default("") // 学习笔记
-  studyTime   Int       @default(0) // 累计学习时长（秒）
+  notes       String    @default("") // 鐎涳缚绡勭粭鏃囶唶
+  studyTime   Int       @default(0) // 缁鳖垵顓哥€涳缚绡勯弮鍫曟毐閿涘牏顫楅敍?
   completedAt DateTime?
   updatedAt   DateTime  @updatedAt
 
@@ -163,7 +168,7 @@ model CourseProgress {
   @@unique([userId, courseId])
 }
 
-// 打卡：体能/学习/饮食
+// 閹垫挸宕遍敍姘秼閼?鐎涳缚绡?妤楊噣顥?
 model CheckIn {
   id        String   @id @default(cuid())
   userId    String
@@ -177,4 +182,24 @@ model CheckIn {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, type, createdAt])
+}
+
+// Diary schedule created from multi-layer diary analysis (PR2)
+model DiarySchedule {
+  id                    String    @id @default(cuid())
+  userId                String
+  journalEntryId        String?
+  title                 String
+  startAt               DateTime
+  endAt                 DateTime?
+  location              String?
+  note                  String?
+  source                String    @default("diary")
+  reminderOffsetMinutes Int       @default(15)
+  createdAt             DateTime  @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  journal JournalEntry?  @relation(fields: [journalEntryId], references: [id], onDelete: SetNull)
+
+  @@index([userId, startAt])
 }
