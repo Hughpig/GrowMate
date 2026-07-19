@@ -4,7 +4,8 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-export function safeJsonParse<T>(value: string, fallback: T): T {
+export function safeJsonParse<T>(value: string | null | undefined, fallback: T): T {
+  if (value == null || value === "") return fallback;
   try {
     return JSON.parse(value) as T;
   } catch {
@@ -36,7 +37,7 @@ export const COMMUNITY_META: Record<
   },
   mental: {
     name: "情绪心理",
-    description: "纯情绪出口，倾诉压力与心事，无评判交流",
+    description: "纯情绪出口，倾诉压力与心声，无评判交流",
     tone: "healing",
   },
   fitness: {
@@ -46,7 +47,7 @@ export const COMMUNITY_META: Record<
   },
   nutrition: {
     name: "饮食营养",
-    description: "食谱分享、健康饮食、身材管理互助",
+    description: "餐食分享、健康饮食、身材管理互助",
     tone: "supportive",
   },
   tech: {
@@ -62,7 +63,7 @@ export const MODULE_META: Record<
 > = {
   fitness: {
     name: "体能训练",
-    description: "居家/户外训练、体态矫正、科学打卡",
+    description: "居家/户外训练、体能精进、科学打卡",
     color: "from-orange-400 to-rose-500",
   },
   nutrition: {

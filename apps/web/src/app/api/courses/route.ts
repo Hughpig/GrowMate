@@ -1,12 +1,26 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { safeJsonParse } from "@/lib/utils";
 
 type ProgressInfo = {
   status: string;
   notes: string;
   studyTime: number;
 };
+
+type Lesson = {
+  title?: string;
+  content?: string;
+  codeExamples?: unknown[];
+  exercises?: unknown[];
+};
+
+function parseLessons(raw: unknown): Lesson[] {
+  if (Array.isArray(raw)) return raw as Lesson[];
+  if (typeof raw !== "string" || !raw.trim()) return [];
+  return safeJsonParse<Lesson[]>(raw, []);
+}
 
 export async function GET() {
   const modules = await prisma.courseModule.findMany({
@@ -23,7 +37,14 @@ export async function GET() {
       where: { userId: session.id },
     });
     progressMap = Object.fromEntries(
-      progress.map((p) => [p.courseId, { status: p.status, notes: p.notes, studyTime: p.studyTime }])
+      progress.map((p) => [
+        p.courseId,
+        {
+          status: p.status,
+          notes: p.notes ?? "",
+          studyTime: p.studyTime ?? 0,
+        },
+      ])
     );
   }
 
@@ -32,8 +53,12 @@ export async function GET() {
       ...m,
       courses: m.courses.map((c) => ({
         ...c,
-        lessons: JSON.parse(c.lessons),
-        progress: progressMap[c.id] || { status: "not_started", notes: "", studyTime: 0 },
+        lessons: parseLessons((c as { lessons?: unknown }).lessons),
+        progress: progressMap[c.id] || {
+          status: "not_started",
+          notes: "",
+          studyTime: 0,
+        },
       })),
     })),
   });
@@ -44,7 +69,12 @@ export async function POST(req: Request) {
   if (!session) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
-  const body = (await req.json()) as { courseId?: string; status?: string; notes?: string; studyTime?: number };
+  const body = (await req.json()) as {
+    courseId?: string;
+    status?: string;
+    notes?: string;
+    studyTime?: number;
+  };
   if (!body.courseId) {
     return NextResponse.json({ error: "缺少 courseId" }, { status: 400 });
   }
